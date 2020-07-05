@@ -5,16 +5,19 @@
     This script will update the WIM file located in the path, installing the current zero-day-patch. The ZDP is expected to be in the ZDP subdirectory of the path.
     If exists this script to install any other packages (LIPs, .NET Framework, FODv2, SSU), always keep in mind, that the ZDP must be installed as the last package.
 .PARAMETERS
-    I will write something here. Someday.
+    See description in region parameters
 .EXAMPLE
     .\Invoke-WinOfflineServicing.ps1
 .NOTES
     Script name:    Invoke-WinOfflineServicing.ps1
-    Version:        1.0.0.5
+    Version:        1.0.0.6
     Author:         Markus Michalski
     DateCreated:    2017-06-07
-    DateModified:   2019-07-30
+    DateModified:   2020-07-05
 #>
+
+#requires -Version 5.1
+#requires -RunAsAdministrator
 
 #region Parameters
 Param(
@@ -31,12 +34,6 @@ Param(
 #endregion
 
 #region Functions
-function Test-Administrator {
-    Write-Verbose "Checking script running elevated."
-    $user = [Security.Principal.WindowsIdentity]::GetCurrent();
-    (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
-}
-
 function NewTemporaryDirectory($Path) {
     Write-Verbose "Checking path: $Path"
 
@@ -117,12 +114,6 @@ Function ShowWimContent {
 #endregion
 
 #region Main
-
-# Is the script running with Admin credentials?
-switch (Test-Administrator) {
-    $True { Write-Host "Script is running elevated." -ForegroundColor Green }
-    $False { Write-Warning “You do not have Administrator rights to run this script!`nPlease re-run this script using an elevated account!”; Break }
-}
 
 # Is the INSTALL.WIM available?
 switch (Test-Path $MyImageFile) {
